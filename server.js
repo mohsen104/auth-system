@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
@@ -7,10 +8,12 @@ import pkg from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { serialize } from 'cookie';
 import 'dotenv/config'
+import verify from 'jsonwebtoken/verify.js';
 
 const app = express();
 
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(cors());
 
 const { hash, compare } = pkg;
@@ -74,6 +77,22 @@ app.get("/api/user/logout", async (req, res) => {
         path: '/',
         maxAge: 0
     })).status(200).send({ messgae: "successfully" })
+})
+
+app.get("/api/user/me", async (req, res) => {
+    const { token } = req.cookies;
+
+    if (!token) {
+        return res.status(422).send({ messgae: "Token invalid !" });
+    }
+
+    const tokenPayload = verify(token, process.env.JWT_SECRET_KEY);
+
+    const { identifier } = tokenPayload;
+
+    const user = await model.findOne({ $or: [{ username: identifier }, { email: identifier }] }, "-password -__v");
+
+    return res.status(200).send({ messgae: "successfully", user })
 })
 
 app.listen(3000, () => {

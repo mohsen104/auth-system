@@ -41,10 +41,21 @@ npm run dev
   GET /api/user/logout
 ```
 
+#### Get Me
+
+```http
+  GET /api/user/me
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `identifier`      | `string` | **Required**. username or email |
+| `password`      | `string` | **Required** *minlength:6* |
 
 ## Features
 
-- bodyParser
+- body-parser
+- cookie-parser
 - cors
 - bcryptjs
 - jsonwebtoken
